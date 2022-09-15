@@ -8,7 +8,7 @@ from vapoursynth import GRAY, YUV, VideoNode, core  # pylint: disable=no-name-in
 __version__ = 0.91
 
 """
-InsaneAA Anti-Aliasing Script (VS port) v0.91 (21.04.2020)
+insane_aa Anti-Aliasing Script (VS port) v0.91 (21.04.2020)
 
 Original idea by tonik & tophf, edited and ported by DJATOM.
 Use this script to fix ugly upscaled anime BDs.
@@ -30,8 +30,8 @@ Prerequisites:
     descale: https://github.com/Irrational-Encoding-Wizardry/vapoursynth-descale
 
 Basic usage:
-    import insaneAA
-    insaneAA.insaneAA(clip, external_aa=None, external_mask=None, faster_aa=False, eedi3_mode=insaneAA.EEDI3Mode.CPU, eedi3_device=-1, eedi3_opt=0, nnedi3_mode=insaneAA.NNEDI3Mode.NNEDI3, nnedi3_device=-1, nnedi3_opt=0, descale_strength=0.3, kernel='bilinear', bicubic_b=1/3, bicubic_c=1/3, lanczos_taps=3, descale_width=None, descale_height=720, pscrn=1, alpha=0.2, beta=0.25, gamma=1000.0, nrad=2, mdis=20, nsize=0, nns=4, output_mode=insaneAA.ClipMode.FULL, input_mode=insaneAA.ClipMode.FULL)
+    import insane_aa
+    insane_aa.insane_aa(clip, external_aa=None, external_mask=None, faster_aa=False, eedi3_mode=insane_aa.EEDI3Mode.CPU, eedi3_device=-1, eedi3_opt=0, nnedi3_mode=insane_aa.NNEDI3Mode.NNEDI3, nnedi3_device=-1, nnedi3_opt=0, descale_strength=0.3, kernel='bilinear', bicubic_b=1/3, bicubic_c=1/3, lanczos_taps=3, descale_width=None, descale_height=720, pscrn=1, alpha=0.2, beta=0.25, gamma=1000.0, nrad=2, mdis=20, nsize=0, nns=4, output_mode=insane_aa.ClipMode.FULL, input_mode=insane_aa.ClipMode.FULL)
         external_aa: if clip is passed, will use it intead of making rescale, otherwise do all processing.
         external_mask: pass external lines mask. Must be clip or ignored.
         faster_aa: slightly different upscaling routine, proposed by ZASTIN. Notably faster at higher native resolutions, but might produce worse results.
@@ -121,7 +121,7 @@ class NNEDI3Mode(Enum):
     NNEDI3CL = 2
 
 
-def insaneAA(
+def insane_aa(
     clip: VideoNode,
     external_aa: VideoNode = None,
     external_mask: VideoNode = None,
@@ -152,7 +152,7 @@ def insaneAA(
     input_mode: ClipMode = ClipMode.FULL,
 ) -> VideoNode:
     if not isinstance(clip, VideoNode):
-        raise TypeError("insaneAA: this is not a clip.")
+        raise TypeError("insane_aa: this is not a clip.")
     width = clip.width
     height = clip.height
     gray_clip = core.std.ShufflePlanes(clip, 0, GRAY)
@@ -277,38 +277,38 @@ def rescale(
     ux = clip.width * 2
     uy = clip.height * 2
     if dx is None:
-        raise ValueError('insaneAA: rescale lacks "dx" parameter.')
+        raise ValueError('insane_aa: rescale lacks "dx" parameter.')
     if dy is None:
-        raise ValueError('insaneAA: rescale lacks "dy" parameter.')
-    eedi3_mode_a, eedi3_mode_b = validateInput(
+        raise ValueError('insane_aa: rescale lacks "dy" parameter.')
+    eedi3_mode_a, eedi3_mode_b = validate_input(
         eedi3_mode,
         (EEDI3Mode, int),
-        "insaneAA: eedi3_mode should be enum with valid mode or tuple with 2 values providing valid modes.",
+        "insane_aa: eedi3_mode should be enum with valid mode or tuple with 2 values providing valid modes.",
     )
-    nnedi3_mode_a, nnedi3_mode_b = validateInput(
+    nnedi3_mode_a, nnedi3_mode_b = validate_input(
         nnedi3_mode,
         (NNEDI3Mode, int),
-        "insaneAA: nnedi3_mode should be enum with valid mode or tuple with 2 values providing valid modes.",
+        "insane_aa: nnedi3_mode should be enum with valid mode or tuple with 2 values providing valid modes.",
     )
-    eedi3_device_a, eedi3_device_b = validateInput(
+    eedi3_device_a, eedi3_device_b = validate_input(
         eedi3_device,
         int,
-        "insaneAA: eedi3_device should be integer with valid device ID or tuple with 2 values providing valid device IDs.",
+        "insane_aa: eedi3_device should be integer with valid device ID or tuple with 2 values providing valid device IDs.",
     )
-    nnedi3_device_a, nnedi3_device_b = validateInput(
+    nnedi3_device_a, nnedi3_device_b = validate_input(
         nnedi3_device,
         int,
-        "insaneAA: nnedi3_device should be integer with valid device ID or tuple with 2 values providing valid device IDs.",
+        "insane_aa: nnedi3_device should be integer with valid device ID or tuple with 2 values providing valid device IDs.",
     )
-    eedi3_opt_a, eedi3_opt_b = validateInput(
+    eedi3_opt_a, eedi3_opt_b = validate_input(
         eedi3_opt,
         int,
-        "insaneAA: eedi3_opt should be integer with valid eedi3/eedi3cl opt value or tuple with 2 values providing valid values.",
+        "insane_aa: eedi3_opt should be integer with valid eedi3/eedi3cl opt value or tuple with 2 values providing valid values.",
     )
-    nnedi3_opt_a, nnedi3_opt_b = validateInput(
+    nnedi3_opt_a, nnedi3_opt_b = validate_input(
         nnedi3_opt,
         (int, str),
-        "insaneAA: nnedi3_opt should be integer or string with valid eedi3/eedi3cl opt value or tuple with 2 values providing valid values.",
+        "insane_aa: nnedi3_opt should be integer or string with valid eedi3/eedi3cl opt value or tuple with 2 values providing valid values.",
     )
     if faster_aa:
         clip = core.std.Transpose(clip)
@@ -442,7 +442,7 @@ def eedi3_instance(
             opt=eedi3_opt,
         )
     else:
-        raise ValueError(f"insaneAA: invalid eedi3 mode - {eedi3_mode}.")
+        raise ValueError(f"insane_aa: invalid eedi3 mode - {eedi3_mode}.")
 
 
 def nnedi3_superclip(
@@ -483,23 +483,23 @@ def nnedi3_superclip(
             opt={0: 1, 1: 0}.get(int(opt), 1),
         )
     else:
-        raise ValueError(f"insaneAA: invalid nnedi3 mode - {nnedi3_mode}.")
+        raise ValueError(f"insane_aa: invalid nnedi3 mode - {nnedi3_mode}.")
 
 
-def validateInput(
+def validate_input(
     var: Union[EEDI3Mode, NNEDI3Mode, int, str, tuple],
-    varType: Union[Type[EEDI3Mode], Type[NNEDI3Mode], Type[int], Type[str], Type[tuple], tuple],
-    errorString: str,
+    var_type: Union[Type[EEDI3Mode], Type[NNEDI3Mode], Type[int], Type[str], Type[tuple], tuple],
+    error_string: str,
 ) -> Any:
-    if isinstance(var, varType):
+    if isinstance(var, var_type):
         return var, var
     elif isinstance(var, tuple):
-        if len(var) == 2 and isinstance(var[0], varType) and isinstance(var[1], varType):
+        if len(var) == 2 and isinstance(var[0], var_type) and isinstance(var[1], var_type):
             return var
         else:
-            raise ValueError(errorString)
+            raise ValueError(error_string)
     else:
-        raise ValueError(errorString)
+        raise ValueError(error_string)
 
 
 def m4(x: int) -> int:
