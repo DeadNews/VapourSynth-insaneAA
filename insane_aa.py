@@ -458,7 +458,7 @@ def nnedi3_superclip(
 ) -> VideoNode:
     if nnedi3_mode in [NNEDI3Mode.NNEDI3CL, 2, "nnedi3cl"]:
         return core.nnedi3cl.NNEDI3CL(
-            clip, field=1, dh=True, nsize=nsize, nns=nns, pscrn=pscrn, device=nnedi3_device
+            clip, field=1, dh=True, nsize=nsize, nns=nns, pscrn=pscrn, device=nnedi3_device, qual=2
         )
     elif nnedi3_mode in [NNEDI3Mode.ZNEDI3, 1, "znedi3"]:
         if opt == 0:
@@ -471,7 +471,16 @@ def nnedi3_superclip(
             _opt = True
             _x_cpu = str(opt)
         return core.znedi3.nnedi3(
-            clip, field=1, dh=True, nsize=nsize, nns=nns, pscrn=pscrn, opt=_opt, x_cpu=_x_cpu
+            clip,
+            field=1,
+            dh=True,
+            nsize=nsize,
+            nns=nns,
+            pscrn=pscrn,
+            opt=_opt,
+            x_cpu=_x_cpu,
+            qual=2,
+            exp=2,
         )
     elif nnedi3_mode in [NNEDI3Mode.NNEDI3, 0, "nnedi3"]:
         # swap 0 and 1 for nnedi3 to behave like a classic avisynth: 0 - use best available functions and 1 - use C functions
@@ -483,6 +492,7 @@ def nnedi3_superclip(
             nns=nns,
             pscrn=pscrn,
             opt={0: 1, 1: 0}.get(int(opt), 1),
+            qual=2,
         )
     else:
         raise ValueError(f"insane_aa: invalid nnedi3 mode - {nnedi3_mode}.")
