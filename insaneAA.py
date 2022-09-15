@@ -1,5 +1,4 @@
 from enum import Enum
-from functools import partial
 from typing import Any, Tuple, Type, Union
 
 import descale
@@ -194,10 +193,12 @@ def insaneAA(
     if output_mode in [ClipMode.UNMASKED, 1, "unmasked"]:
         return upscale
     if not isinstance(external_aa, VideoNode) or input_mode in [ClipMode.UNMASKED, 1, "unmasked"]:
-        if not isinstance(external_mask, VideoNode):
-            linemask = core.std.Sobel(gray_clip).std.Expr("x 2 *").std.Maximum()
-        else:
-            linemask = external_mask
+        linemask = (
+            external_mask
+            if isinstance(external_mask, VideoNode)
+            else core.std.Sobel(gray_clip).std.Expr("x 2 *").std.Maximum()
+        )
+
         aa_clip = core.std.MaskedMerge(gray_clip, upscale, linemask)
     else:
         aa_clip = external_aa
@@ -221,8 +222,9 @@ def revert_upscale(
     width = clip.width
     height = clip.height
     descale_width = (
-        m4((width * descale_height) / height) if descale_width == None else descale_width
+        m4((width * descale_height) / height) if descale_width is None else descale_width
     )
+
     descale_natural = descale.Descale(
         clip,
         descale_width,
@@ -271,7 +273,7 @@ def rescale(
     mdis: float = 20,
     nsize: int = 0,
     nns: int = 4,
-):
+) -> VideoNode:
     ux = clip.width * 2
     uy = clip.height * 2
     if dx is None:
