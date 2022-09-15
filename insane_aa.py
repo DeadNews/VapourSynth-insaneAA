@@ -157,17 +157,19 @@ def insane_aa(
     height = clip.height
     gray_clip = core.std.ShufflePlanes(clip, 0, GRAY)
     if not isinstance(external_aa, VideoNode):
-        descale_clip = revert_upscale(
-            gray_clip,
-            descale_strength,
-            kernel,
-            descale_width,
-            descale_height,
-            bicubic_b,
-            bicubic_c,
-            lanczos_taps,
-            dehalo,
-        )
+        if gray_clip.height == descale_height:
+            descale_clip = gray_clip
+        else:
+            descale_clip = revert_upscale(
+                gray_clip,
+                descale_strength,
+                kernel,
+                descale_width,
+                descale_height,
+                bicubic_b,
+                bicubic_c,
+                lanczos_taps,
+            )
         upscale = rescale(
             descale_clip,
             faster_aa,
